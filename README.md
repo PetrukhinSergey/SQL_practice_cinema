@@ -33,3 +33,6 @@
 </details>
 
 #### Cсылка на файл .sql со структурой запросов по Блоку №1
+<div align="left"><a href="https://github.com/PetrukhinSergey/SQL_practice_cinema/blob/main/1_Block.sql" target="_blank">Запросы_Блок_1</a><img src="https://user-images.githubusercontent.com/108893866/179385582-25cdd117-2530-42e3-b7dc-1edd323f3e68.png" width="120" />
+</div>
+
