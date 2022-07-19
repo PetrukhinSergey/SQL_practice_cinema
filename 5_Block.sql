@@ -1,11 +1,11 @@
---1. Íàïèñàòü SQL-çàïðîñ, êîòîðûé âûâîäèò âñþ èíôîðìàöèþ î ôèëüìàõ ñî ñïåöèàëüíûì àòðèáóòîì "Behind the Scenes".
+﻿--1. Написать SQL-запрос, который выводит всю информацию о фильмах со специальным атрибутом "Behind the Scenes".
 
 -- explain analyze -- 67.50 / 0.475
 select film_id, title, special_features
 from film
 where special_features && array['Behind the Scenes']
 
---2. Íàïèñàòü åùå 2 âàðèàíòà ïîèñêà ôèëüìîâ ñ àòðèáóòîì "Behind the Scenes", èñïîëüçóÿ äðóãèå ôóíêöèè èëè îïåðàòîðû ÿçûêà SQL äëÿ ïîèñêà çíà÷åíèÿ â ìàññèâå.
+--2. Написать еще 2 варианта поиска фильмов с атрибутом "Behind the Scenes", используя другие функции или операторы языка SQL для поиска значения в массиве.
 
 -- explain analyze -- 250 / 1.385
 select film_id, title, array_agg(unnest)
@@ -15,13 +15,13 @@ from (
 where unnest = 'Behind the Scenes'
 group by film_id, title
 
--- èëè
+-- или
 select film_id, title, special_features
 from film
 where special_features @> array['Behind the Scenes']
 
---3. Äëÿ êàæäîãî ïîêóïàòåëÿ ïîñ÷èòàòü ñêîëüêî îí áðàë â àðåíäó ôèëüìîâ ñî ñïåöèàëüíûì àòðèáóòîì "Behind the Scenes.
---Îáÿçàòåëüíîå óñëîâèå: èñïîëüçîâàòü çàïðîñ èç çàäàíèÿ 1, --ïîìåùåííûé â CTE.
+--3. Для каждого покупателя посчитать сколько он брал в аренду фильмов со специальным атрибутом "Behind the Scenes.
+--Обязательное условие: использовать запрос из задания 1, --помещенный в CTE.
 
 with ste as (
 	select film_id, title, special_features
@@ -37,8 +37,8 @@ join film f on i.film_id = f.film_id
 join ste on ste.film_id = f.film_id 
 order by 1
 
---4. Äëÿ êàæäîãî ïîêóïàòåëÿ ïîñ÷èòàòü ñêîëüêî îí áðàë â àðåíäó ôèëüìîâ ñî ñïåöèàëüíûì àòðèáóòîì "Behind the Scenes".
---Îáÿçàòåëüíîå óñëîâèå: èñïîëüçîâàòü çàïðîñ èç çàäàíèÿ 1, ïîìåùåííûé â ïîäçàïðîñ.
+--4. Для каждого покупателя посчитать сколько он брал в аренду фильмов со специальным атрибутом "Behind the Scenes".
+--Обязательное условие: использовать запрос из задания 1, помещенный в подзапрос.
 
 select distinct r.customer_id,
 	count (t.film_id) over (partition by r.customer_id) as film_count
@@ -50,19 +50,19 @@ join inventory i on t.film_id = i.film_id
 join rental r on i.inventory_id = r.inventory_id
 order by 1 
 
--- 5. Âûâåcòè ñêîëüêî ðàç âñòðå÷àåòñÿ ñïåöèàëüíûé àòðèáóò (special_features) ó ôèëüìà
+-- 5. Вывеcти сколько раз встречается специальный атрибут (special_features) у фильма
 
 select title, array_length(special_features, 1)
 from film
 
--- 6. Âûâåcòè ñêîëüêî ýëåìåíòîâ ñîäåðæèò àòðèáóò special_features
+-- 6. Вывеcти сколько элементов содержит атрибут special_features
 
 select array_length('{{1,2,3},{1,2,3},{1,2,3},{1,2,3},{1,2,3},{1,2,3}}'::text[], 2)
 
--- 7. Âûâåñòè âñå ôèëüìû ñîäåðæàùèå ñïåöèàëüíûå àòðèáóòû: 'Trailers','Commentaries'
--- * Èñïîëüçóéòå îïåðàòîðû: @> - ñîäåðæèò; <@ - ñîäåðæèòñÿ â; *  ARRAY[ýëåìåíòû] - äëÿ îïèñàíèÿ ìàññèâà
+-- 7. Вывести все фильмы содержащие специальные атрибуты: 'Trailers','Commentaries'
+-- * Используйте операторы: @> - содержит; <@ - содержится в; *  ARRAY[элементы] - для описания массива
 
--- ÏËÎÕÀß ÏÐÀÊÒÈÊÀ --
+-- ПЛОХАЯ ПРАКТИКА --
 select title, special_features
 from film
 where special_features[1] = 'Trailers' or special_features[1] = 'Commentaries'
@@ -70,18 +70,18 @@ where special_features[1] = 'Trailers' or special_features[1] = 'Commentaries'
 	or special_features[3] = 'Trailers' or special_features[3] = 'Commentaries'
 	or special_features[4] = 'Trailers' or special_features[4] = 'Commentaries'
 
--- èëè
+-- или
 select title, special_features
 from film
 where special_features::text like '%Trailers%' or special_features::text like '%Commentaries%'
 
--- èëè
+-- или
 select title, special_features
 from film
 where array_position(special_features, 'Trailers') > 0 or 
 	array_position(special_features, 'Commentaries') > 0
 
--- ×ÒÎ-ÒÎ ÑÐÅÄÍÅÅ --
+-- ЧТО-ТО СРЕДНЕЕ --
 select title, array_agg(unnest)
 from (
 	select film_id, title, unnest(special_features)
@@ -89,32 +89,32 @@ from (
 where unnest = 'Trailers' or unnest = 'Commentaries'
 group by film_id, title
 
--- ÕÎÐÎØÀß ÏÐÀÊÒÈÊÀ --
+-- ХОРОШАЯ ПРАКТИКА --
 select title, special_features
 from film
 where special_features && array['Trailers'] or special_features && array['Commentaries']
 
--- èëè
+-- или
 select title, special_features
 from film
 where special_features @> array['Trailers'] or special_features @> array['Commentaries']
 
---èëè
+--или
 select title, special_features
 from film
 where array['Trailers'] <@ special_features or array['Commentaries'] <@ special_features
 
---èëè
+--или
 select title, special_features
 from film
 where special_features <@ array['Trailers'] or special_features <@ array['Commentaries']
 
--- èëè
+-- или
 select title, special_features
 from film
 where 'Trailers' = any(special_features) or 'Commentaries' = any(special_features) 
 	
---8. Ñîçäàòü ìàòåðèàëèçîâàííîå ïðåäñòàâëåíèå ñ çàïðîñîì èç ïðåäûäóùåãî çàäàíèÿ è íàïèñàòü çàïðîñ äëÿ îáíîâëåíèÿ ìàòåðèàëèçîâàííîãî ïðåäñòàâëåíèÿ
+--8. Создать материализованное представление с запросом из предыдущего задания и написать запрос для обновления материализованного представления
 
 create materialized view demo_1 as 
 	select distinct r.customer_id,
@@ -129,13 +129,13 @@ create materialized view demo_1 as
 
 refresh materialized view demo_1
 
---9. Ñîçäàòü ìàòåðèàëèçîâàííîå ïðåäñòàâëåíèå ñ êîëîíêàìè êëèåíò (ÔÈÎ; email) è title ôèëüìà, êîòîðûé îí áðàë â ïðîêàò ïîñëåäíèì
--- Ñîçäàòü ìàòåðèàëèçîâàííîå ïðåäñòàâëåíèå áåç íàïîëíåíèÿ (with NO DATA):
+--9. Создать материализованное представление с колонками клиент (ФИО; email) и title фильма, который он брал в прокат последним
+-- Создать материализованное представление без наполнения (with NO DATA):
 
 create materialized view task_3 as
 	with cte as (
 		select *, row_number() over (partition by customer_id order by rental_date desc)
-		from rental r) -- âîçâðàùàåì ñòðîêè èç rental ñ ðåçóëüòàòîì row_number() â îêíå ïî customer_id
+		from rental r) -- возвращаем строки из rental с результатом row_number() в окне по customer_id
 	select concat(c.last_name, ' ', c.first_name), c.email, f.title
 	from cte
 	join customer c on c.customer_id = cte.customer_id
@@ -144,7 +144,7 @@ create materialized view task_3 as
 	where row_number = 1
 with no data
 
---10. Èñïîëüçóÿ îêîííóþ ôóíêöèþ âûâåñòè äëÿ êàæäîãî ñîòðóäíèêà ñâåäåíèÿ î ñàìîé ïåðâîé ïðîäàæå ýòîãî ñîòðóäíèêà.
+--10. Используя оконную функцию вывести для каждого сотрудника сведения о самой первой продаже этого сотрудника.
 
 select t.staff_id, f.film_id, f.title, t.amount, t.payment_date, c.last_name, c.first_name
 from (
@@ -158,13 +158,13 @@ join film f on f.film_id = i.film_id
 where row_number = 1
 
 
---11. Äëÿ êàæäîãî ìàãàçèíà îïðåäåëèòü è âûâåäñòè îäíèì SQL-çàïðîñîì ñëåäóþùèå àíàëèòè÷åñêèå ïîêàçàòåëè:
--- * äåíü, â êîòîðûé àðåíäîâàëè áîëüøå âñåãî ôèëüìîâ (äåíü â ôîðìàòå ãîä-ìåñÿö-äåíü)
--- * êîëè÷åñòâî ôèëüìîâ âçÿòûõ â àðåíäó â ýòîò äåíü
--- * äåíü, â êîòîðûé ïðîäàëè ôèëüìîâ íà íàèìåíüøóþ ñóììó (äåíü â ôîðìàòå ãîä-ìåñÿö-äåíü)
--- * ñóììó ïðîäàæè â ýòîò äåíü
+--11. Для каждого магазина определить и выведсти одним SQL-запросом следующие аналитические показатели:
+-- * день, в который арендовали больше всего фильмов (день в формате год-месяц-день)
+-- * количество фильмов взятых в аренду в этот день
+-- * день, в который продали фильмов на наименьшую сумму (день в формате год-месяц-день)
+-- * сумму продажи в этот день
 
-select t1.store_id as "ID ìàãàçèíà", rental_date as "Äàòà ñ íàèáîëüøåé àðåíäîé â äåíü", count as "Êîë-âî ôèëüìîâ, â ýòîò äåíü", payment_date as "Äàòà ñ íàèìåíüøåé ñóììîé ïðîäàæè", sum as "Ñóììà ïðîäàæè" 
+select t1.store_id as "ID магазина", rental_date as "Дата с наибольшей арендой в день", count as "Кол-во фильмов, в этот день", payment_date as "Дата с наименьшей суммой продажи", sum as "Сумма продажи" 
 	from (
 		select i.store_id, r.rental_date::date, count(i.film_id), 
 			row_number() over (partition by i.store_id order by count(i.film_id) desc) as count_rental
