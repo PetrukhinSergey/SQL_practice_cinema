@@ -173,6 +173,7 @@
 </div>
 
 <h3 align="center">Лабораторная работа:</a></h3>
+
 ##### Цель: #####
 * применить навыки для решения предполагаемых бизнес-задач
 <details>
@@ -185,6 +186,7 @@
 5. Статистика своевременности возврата арендованных фильмов.  
 </details>
 
-#### Cсылка на файл .sql со структурой запросов по Лабораторной работе
+#### Ссылка на файл .sql со структурой запросов по Лабораторной работе
+
 <div align="left"><a href="https://github.com/PetrukhinSergey/SQL_practice_cinema/blob/main/Laboratory_work.sql" target="_blank">Лабораторная работа</a><img src="https://user-images.githubusercontent.com/108893866/179385582-25cdd117-2530-42e3-b7dc-1edd323f3e68.png" width="120" />
 </div>
