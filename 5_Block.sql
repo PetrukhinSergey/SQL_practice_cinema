@@ -1,5 +1,4 @@
 --1. Íàïèñàòü SQL-çàïðîñ, êîòîðûé âûâîäèò âñþ èíôîðìàöèþ î ôèëüìàõ ñî ñïåöèàëüíûì àòðèáóòîì "Behind the Scenes".
-олрропропаы
 
 -- explain analyze -- 67.50 / 0.475
 select film_id, title, special_features
